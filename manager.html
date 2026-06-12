@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Ad Manager</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input, select { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 4px; }
+        .btn-add { background: #28a745; color: white; }
+        .btn-save { background: #007bff; color: white; width: 100%; margin-top: 20px; font-size: 1.1em; }
+        .ad-item { background: #eee; padding: 10px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border-radius: 4px; }
+        .btn-remove { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Ad Management</h2>
+    <div class="form-group">
+        <label>Media URL (Image or Video Link)</label>
+        <input type="text" id="url" placeholder="https://example.com/ad.jpg">
+    </div>
+    <div class="form-group">
+        <label>Type</label>
+        <select id="type">
+            <option value="image">Image</option>
+            <option value="video">Video</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label>Duration (Seconds - Images only)</label>
+        <input type="number" id="duration" value="5">
+    </div>
+    <button class="btn-add" onclick="addAd()">Add to Playlist</button>
+
+    <hr>
+    <h3>Current Playlist</h3>
+    <div id="playlist-preview"></div>
+    <button class="btn-save" onclick="savePlaylist()">Apply & Save Playlist</button>
+    <p><small>Note: Open <b>display.html</b> in another tab to see the ads.</small></p>
+</div>
+
+<script>
+    let ads = JSON.parse(localStorage.getItem('ad_playlist')) || [];
+
+    function renderAds() {
+        const container = document.getElementById('playlist-preview');
+        container.innerHTML = '';
+        ads.forEach((ad, index) => {
+            container.innerHTML += `
+                <div class="ad-item">
+                    <span>[${ad.type.toUpperCase()}] ${ad.url.substring(0, 30)}...</span>
+                    <button class="btn-remove" onclick="removeAd(${index})">Remove</button>
+                </div>`;
+        });
+    }
+
+    function addAd() {
+        const url = document.getElementById('url').value;
+        const type = document.getElementById('type').value;
+        const duration = document.getElementById('duration').value;
+        if (!url) return alert("Please enter a URL");
+        
+        ads.push({ url, type, duration: parseInt(duration) * 1000 });
+        renderAds();
+    }
+
+    function removeAd(index) {
+        ads.splice(index, 1);
+        renderAds();
+    }
+
+    function savePlaylist() {
+        localStorage.setItem('ad_playlist', JSON.stringify(ads));
+        alert("Playlist Saved! The display page will update automatically.");
+    }
+
+    renderAds();
+</script>
+</body>
+</html>
